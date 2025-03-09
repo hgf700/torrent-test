@@ -1,18 +1,19 @@
 import json
 import sys
+import bencodepy
 
 def decode_bencode(bencoded_value):
-    def extract_string(data):
+    def extract_string(data): 
         length, rest = data.split(b":", 1)
         length = int(length)
         return rest[:length], rest[length:]
     
     def decode(data):
-        if data[0:1].isdigit():
+        if data[0:1].isdigit(): #5:hello
             decoded_str, rest = extract_string(data)
             return decoded_str, rest
         
-        elif data.startswith(b'i'):
+        elif data.startswith(b'i'): # i52e
             end = data.index(b'e')
             return int(data[1:end]), data[end+1:]
         
@@ -31,10 +32,6 @@ def decode_bencode(bencoded_value):
                 item, data = decode(data)
                 result.append(item)
             return result, data[1:] 
-
-
-
-
 
         else:
             raise NotImplementedError("Unsupported Bencode format")
@@ -55,6 +52,7 @@ def main():
 
         decoded_result = decode_bencode(bencoded_value) 
         print(json.dumps(decoded_result, default=bytes_to_str))
+    
     else:
         raise NotImplementedError(f"Unknown command {command}")
 
