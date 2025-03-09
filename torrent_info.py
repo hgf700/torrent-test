@@ -1,6 +1,7 @@
 import json
 import sys
 import bencodepy
+import hashlib
 
 def parse_file(file):
     try:
@@ -9,9 +10,14 @@ def parse_file(file):
 
         tracker_url = decoded_data.get(b'announce', b'').decode() 
         length = decoded_data.get(b'info', {}).get(b'length', 0) 
+        to_code = decoded_data.get(b'info',{})
+        coded = bencodepy.encode(to_code)
+        hash = hashlib.sha1(coded).hexdigest()
+
         return {
             "Tracker URL": tracker_url,
-            "Length": length
+            "Length": length,
+            "Coded SHA1" : hash
         }
 
     except Exception as e:
