@@ -11,21 +11,36 @@ def decode_bencode(bencoded_value):
         if data[0:1].isdigit():
             decoded_str, rest = extract_string(data)
             return decoded_str, rest
+        
         elif data.startswith(b'i'):
             end = data.index(b'e')
             return int(data[1:end]), data[end+1:]
-        elif data.startswith(b'l'):
+        
+        elif data.startswith(b'l'): #l5:helloi52ee
             data = data[1:]
             result = []
             while not data.startswith(b'e'):
                 item, data = decode(data)
                 result.append(item)
-            return result, data[1:]  # Pomijamy 'e'
+            return result, data[1:] 
+         
+        elif data.startswith(b'd'): #d3:foo3:bar5:helloi52ee
+            data = data[1:]
+            result = []
+            while not data.startswith(b'e'):
+                item, data = decode(data)
+                result.append(item)
+            return result, data[1:] 
+
+
+
+
+
         else:
             raise NotImplementedError("Unsupported Bencode format")
 
     decoded_result, _ = decode(bencoded_value)
-    return decoded_result  # Zwracamy tylko wynik
+    return decoded_result 
 
 def main():
     command = sys.argv[1]
@@ -38,7 +53,7 @@ def main():
                 return data.decode()
             raise TypeError(f"Type not serializable: {type(data)}")
 
-        decoded_result = decode_bencode(bencoded_value)  # Pobieramy tylko wynik
+        decoded_result = decode_bencode(bencoded_value) 
         print(json.dumps(decoded_result, default=bytes_to_str))
     else:
         raise NotImplementedError(f"Unknown command {command}")
