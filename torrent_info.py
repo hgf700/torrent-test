@@ -6,6 +6,7 @@ import random
 import struct
 import json
 import sys
+import socket
 
 def parse_file(file):
     try:
@@ -92,6 +93,43 @@ def httpget(file):
         print(f"Błąd: {e}")
         sys.exit(1)
 
+def send_handshake(file):
+    try:
+        peers = httpget(file)
+        
+        print(f"Lista peerów: {peers['peers']}")
+        
+        # peers otrzymywany jest jako 2 wymairowy macierz
+        ip, port = peers["peers"][0].split(":")
+        print(f"Łączę się z peerem: {ip}:{port}")
+
+        with open(file, "rb") as f:
+            bencoded_value = f.read()
+
+        decoded_data = bencodepy.decode(bencoded_value)
+        info_dict = decoded_data.get(b'info', {})
+        bencoded_info = bencodepy.encode(info_dict)
+        info_hash = hashlib.sha1(bencoded_info).digest()
+
+        handshake = (
+            b"\x13BitTorrent protocol\x00\x00\x00\x00\x00\x00\x00\x00"  
+            + info_hash  
+            + b"00112233445566778899"  
+        )
+
+        # AF_INET (ipv4) SOCK_STREAM (port)
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            try:
+                s.connect((ip, int(port)))
+                s.send(handshake)
+                print(f"Peer ID: {s.recv(68)[48:].hex()}")
+            except Exception as e:
+                print(f"Nie można połączyć się z {ip}:{port} - {e}")
+
+    except Exception as e:
+        print(f"Error: {e}")
+
+
 def main():
     if  sys.argv[1] == "info":
         file_path = sys.argv[2]
@@ -104,6 +142,10 @@ def main():
         result = httpget(file_path)
 
         print(json.dumps(result, indent=4))
+    
+    if sys.argv[1] == "handshake":
+        file_path = sys.argv[2]
+        result = send_handshake(file_path)
 
 if __name__ == "__main__":
     main()
