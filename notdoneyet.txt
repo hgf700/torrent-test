@@ -1,0 +1,11 @@
+build your own torrent
+https://app.codecrafters.io/courses/bittorrent/stages/hw0?repo=6df7bc58-2b7e-46fb-8bad-4bd006696780
+
+(with torrent)
+
+download piece
+download the whole file
+
+(with magnet)
+
+magnet:?xt=urn:btih:ad42ce8109f54c99613ce38f9b4d87e70f24a165&dn=magnet1.gif&tr=http%3A%2F%2Fbittorrent-test-tracker.codecrafters.io%2Fannounce
