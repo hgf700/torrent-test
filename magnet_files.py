@@ -24,12 +24,10 @@ def parse_magnet(magnet_link):
 
     
 def main():
-    if len(sys.argv) < 2:
-        print("Użycie: python magnet_files.py 'magnet:?xt=...'")
-        sys.exit(1)
+    if  sys.argv[1] == "magnet_parse":
 
-    magnet_link = sys.argv[1]
-    parse_magnet(magnet_link)
+        magnet_link = sys.argv[2]
+        parse_magnet(magnet_link)
 
 if __name__ == "__main__":
     main()
